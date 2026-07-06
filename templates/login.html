@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block title %}Log in &middot; LedgerClass{% endblock %}
+
+{% block auth_content %}
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-brand">
+            <i class="bi bi-mortarboard-fill"></i>
+            <span>Ledger<strong>Class</strong></span>
+        </div>
+        <p class="auth-subtitle">Sign in to manage student records.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('login') }}" novalidate>
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" name="username" required autofocus>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Sign in</button>
+        </form>
+
+        <div class="auth-hint">
+            <i class="bi bi-info-circle"></i>
+            Default admin: <code>admin</code> / <code>admin123</code>
+        </div>
+    </div>
+</div>
+{% endblock %}

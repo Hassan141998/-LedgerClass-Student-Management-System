@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Report &middot; LedgerClass</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #1a1a1a;
+            margin: 32px;
+        }
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 2px solid #1a1a1a;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        .report-header h1 {
+            font-size: 20px;
+            margin: 0;
+        }
+        .report-meta {
+            font-size: 12px;
+            color: #555;
+            text-align: right;
+        }
+        .filters-line {
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 6px 8px;
+            text-align: left;
+        }
+        th {
+            background: #f0f0f0;
+        }
+        .report-footer {
+            margin-top: 24px;
+            font-size: 11px;
+            color: #888;
+            text-align: right;
+        }
+        @media print {
+            body { margin: 10mm; }
+        }
+    </style>
+</head>
+<body>
+    <div class="report-header">
+        <h1>Student Directory Report</h1>
+        <div class="report-meta">
+            Generated: {{ generated_at.strftime('%d %b %Y, %H:%M UTC') }}<br>
+            Total Records: {{ students|length }}
+        </div>
+    </div>
+
+    {% if filters.q or filters.program or filters.semester %}
+    <div class="filters-line">
+        Filters applied:
+        {% if filters.q %}Search="{{ filters.q }}"{% endif %}
+        {% if filters.program %} &middot; Program="{{ filters.program }}"{% endif %}
+        {% if filters.semester %} &middot; Semester="{{ filters.semester }}"{% endif %}
+    </div>
+    {% endif %}
+
+    <table>
+        <thead>
+            <tr>
+                <th>Roll No.</th>
+                <th>Name</th>
+                <th>Father's Name</th>
+                <th>Program</th>
+                <th>Sem.</th>
+                <th>Section</th>
+                <th>Phone</th>
+                <th>Address</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in students %}
+            <tr>
+                <td>{{ s.roll_no }}</td>
+                <td>{{ s.name }}</td>
+                <td>{{ s.father_name }}</td>
+                <td>{{ s.program }}</td>
+                <td>{{ s.semester }}</td>
+                <td>{{ s.section }}</td>
+                <td>{{ s.phone }}</td>
+                <td>{{ s.address }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="8" style="text-align:center;">No records match the selected filters.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="report-footer">LedgerClass Student Management System</div>
+
+    <script>
+        window.onload = function () {
+            window.print();
+        };
+    </script>
+</body>
+</html>

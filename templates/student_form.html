@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+{% block title %}{{ 'Edit' if mode == 'edit' else 'Add' }} Student &middot; LedgerClass{% endblock %}
+{% block header_title %}<h1 class="page-title">{{ 'Edit Student' if mode == 'edit' else 'Add New Student' }}</h1>{% endblock %}
+
+{% block content %}
+<div class="panel form-panel">
+    <div class="panel-body">
+        <form method="POST"
+              action="{{ url_for('edit_student', student_id=student.id) if mode == 'edit' else url_for('add_student') }}"
+              id="studentForm" novalidate>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Roll Number</label>
+                    <input type="text" class="form-control" name="roll_no" required
+                           value="{{ student.roll_no if student else '' }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-control" name="name" required
+                           value="{{ student.name if student else '' }}">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Father's Name</label>
+                    <input type="text" class="form-control" name="father_name" required
+                           value="{{ student.father_name if student else '' }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Program</label>
+                    <input type="text" class="form-control" name="program" required
+                           placeholder="e.g. BS Computer Science"
+                           value="{{ student.program if student else '' }}">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Semester</label>
+                    <input type="number" min="1" max="12" class="form-control" name="semester" required
+                           value="{{ student.semester if student else '' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Section</label>
+                    <input type="text" class="form-control" name="section" required
+                           value="{{ student.section if student else '' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Phone</label>
+                    <input type="text" class="form-control" name="phone" id="phoneInput" required
+                           placeholder="e.g. 03001234567"
+                           value="{{ student.phone if student else '' }}">
+                    <div class="invalid-feedback" id="phoneFeedback">Phone number looks invalid.</div>
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Address</label>
+                    <textarea class="form-control" name="address" rows="3" required>{{ student.address if student else '' }}</textarea>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check2-circle"></i>
+                    {{ 'Save Changes' if mode == 'edit' else 'Add Student' }}
+                </button>
+                <a href="{{ url_for('students') }}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,392 @@
+/* ==========================================================================
+   LedgerClass — visual identity
+   Palette: ink navy (#131B34), parchment bg (#F6F5F1), brass accent (#C8963E),
+   ledger-red for destructive actions (#B24C4C), muted sage for success (#4C8B6F)
+   Type: Space Grotesk (display / headings) + Inter (body / data)
+   ========================================================================== */
+
+:root {
+    --ink: #131B34;
+    --ink-light: #1F2A4D;
+    --parchment: #F6F5F1;
+    --paper: #FFFFFF;
+    --brass: #C8963E;
+    --brass-dark: #A87A2E;
+    --line: #E4E1D8;
+    --text-muted: #6B7280;
+    --success: #4C8B6F;
+    --danger: #B24C4C;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--parchment);
+    color: #232323;
+}
+
+h1, h2, h3, h4, .page-title, .metric-value, .sidebar-brand, .auth-brand {
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+/* ---------- App shell ---------- */
+.app-shell {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--ink);
+    color: #E7E5DC;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.15rem;
+    font-weight: 600;
+    padding: 0 24px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 12px;
+    color: #fff;
+}
+
+.sidebar-brand i {
+    color: var(--brass);
+    font-size: 1.3rem;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0 12px;
+    flex: 1;
+}
+
+.sidebar-nav .nav-link {
+    color: #C7C9D9;
+    padding: 10px 14px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.92rem;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sidebar-nav .nav-link i {
+    width: 18px;
+    text-align: center;
+}
+
+.sidebar-nav .nav-link:hover {
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+}
+
+.sidebar-nav .nav-link.active {
+    background: var(--brass);
+    color: var(--ink);
+    font-weight: 600;
+}
+
+.sidebar-footer {
+    padding: 12px 24px 0;
+}
+
+/* ---------- Main column ---------- */
+.main-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.topbar {
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.page-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--ink);
+}
+
+.user-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--parchment);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 14px 6px 6px;
+}
+
+.avatar-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--brass);
+    color: var(--ink);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+}
+
+.role-badge {
+    font-size: 0.65rem;
+    padding: 2px 7px;
+    margin-left: 4px;
+    vertical-align: middle;
+}
+
+.role-admin {
+    background: var(--brass);
+    color: var(--ink);
+}
+
+.role-staff {
+    background: var(--ink-light);
+    color: #fff;
+}
+
+.content-area {
+    padding: 24px 28px 48px;
+    flex: 1;
+}
+
+/* ---------- Cards / panels ---------- */
+.panel {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.panel-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--line);
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.panel-body {
+    padding: 20px;
+}
+
+.panel-footer {
+    padding: 12px 20px;
+    border-top: 1px solid var(--line);
+}
+
+.metric-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 100%;
+    border-left: 4px solid var(--brass);
+}
+
+.metric-card.metric-accent { border-left-color: var(--success); }
+.metric-card.metric-dark { border-left-color: var(--ink); }
+
+.metric-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: var(--parchment);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: var(--brass);
+}
+
+.metric-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+}
+
+.metric-label {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: 4px;
+}
+
+/* Program breakdown bars */
+.breakdown-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.breakdown-list li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    margin-bottom: 14px;
+    position: relative;
+}
+
+.breakdown-count {
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.breakdown-bar {
+    grid-column: 1 / 3;
+    height: 6px;
+    background: var(--parchment);
+    border-radius: 4px;
+    margin-top: 6px;
+    overflow: hidden;
+}
+
+.breakdown-fill {
+    height: 100%;
+    background: var(--brass);
+    border-radius: 4px;
+}
+
+/* ---------- Tables ---------- */
+.data-table thead th {
+    background: var(--parchment);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--line);
+    font-weight: 600;
+}
+
+.data-table td {
+    vertical-align: middle;
+    font-size: 0.9rem;
+}
+
+/* ---------- Buttons ---------- */
+.btn-primary {
+    background: var(--ink);
+    border-color: var(--ink);
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background: var(--ink-light);
+    border-color: var(--ink-light);
+}
+
+.btn-outline-secondary {
+    border-color: var(--line);
+    color: var(--ink);
+}
+
+/* ---------- Forms ---------- */
+.form-panel {
+    max-width: 760px;
+}
+
+.form-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--brass);
+    box-shadow: 0 0 0 0.2rem rgba(200, 150, 62, 0.2);
+}
+
+/* ---------- Auth page ---------- */
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ink);
+    background-image: radial-gradient(circle at 20% 20%, rgba(200,150,62,0.12), transparent 40%);
+    padding: 20px;
+}
+
+.auth-card {
+    background: var(--paper);
+    border-radius: 16px;
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+}
+
+.auth-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 6px;
+}
+
+.auth-brand i {
+    color: var(--brass);
+}
+
+.auth-subtitle {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+.auth-hint {
+    margin-top: 18px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    background: var(--parchment);
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+/* ---------- Misc ---------- */
+.flash-stack {
+    margin-bottom: 16px;
+}
+
+@media (max-width: 991.98px) {
+    .sidebar {
+        position: fixed;
+        left: -240px;
+        z-index: 1050;
+        transition: left 0.2s ease;
+    }
+    .sidebar.open {
+        left: 0;
+    }
+}
+
+:focus-visible {
+    outline: 2px solid var(--brass);
+    outline-offset: 2px;
+}

@@ -1,0 +1,97 @@
+{% extends "layout.html" %}
+{% block title %}Dashboard &middot; LedgerClass{% endblock %}
+{% block header_title %}<h1 class="page-title">Dashboard</h1>{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="metric-card metric-primary">
+            <div class="metric-icon"><i class="bi bi-people-fill"></i></div>
+            <div>
+                <div class="metric-value">{{ total_students }}</div>
+                <div class="metric-label">Total Registered Students</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="metric-card metric-accent">
+            <div class="metric-icon"><i class="bi bi-mortarboard-fill"></i></div>
+            <div>
+                <div class="metric-value">{{ total_programs }}</div>
+                <div class="metric-label">Active Programs</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="metric-card metric-dark">
+            <div class="metric-icon"><i class="bi bi-clock-history"></i></div>
+            <div>
+                <div class="metric-value">{{ recent_students|length }}</div>
+                <div class="metric-label">Recently Added</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-5">
+        <div class="panel">
+            <div class="panel-header">Breakdown by Program</div>
+            <div class="panel-body">
+                {% if program_breakdown %}
+                <ul class="breakdown-list">
+                    {% for program, count in program_breakdown %}
+                    <li>
+                        <span>{{ program }}</span>
+                        <span class="breakdown-count">{{ count }}</span>
+                        <div class="breakdown-bar">
+                            <div class="breakdown-fill" style="width: {{ (count / total_students * 100) if total_students else 0 }}%"></div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted mb-0">No student data yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="panel">
+            <div class="panel-header d-flex justify-content-between align-items-center">
+                <span>Recently Added Students</span>
+                <a href="{{ url_for('students') }}" class="small">View all &rarr;</a>
+            </div>
+            <div class="panel-body p-0">
+                {% if recent_students %}
+                <table class="table table-hover mb-0 data-table">
+                    <thead>
+                        <tr>
+                            <th>Roll No.</th>
+                            <th>Name</th>
+                            <th>Program</th>
+                            <th>Semester</th>
+                            <th>Added</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in recent_students %}
+                        <tr>
+                            <td>{{ s.roll_no }}</td>
+                            <td>{{ s.name }}</td>
+                            <td>{{ s.program }}</td>
+                            <td>{{ s.semester }}</td>
+                            <td class="text-muted small">{{ s.created_at.strftime('%d %b %Y') if s.created_at else '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-muted p-3 mb-0">No students registered yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
