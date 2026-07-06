@@ -56,10 +56,6 @@ if is_postgres:
         "pool_pre_ping": True,
         "connect_args": {
             "connect_timeout": 10,
-            # Disable server-side prepared statement caching — PgBouncer's
-            # transaction pooling mode (which Neon's pooler uses) doesn't
-            # support prepared statements persisting across statements.
-            "options": "-c statement_timeout=15000",
         },
     }
 else:
