@@ -14,6 +14,7 @@ from flask import (
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.pool import NullPool
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # --------------------------------------------------------------------------
@@ -37,7 +38,36 @@ if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = db_url
-app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_pre_ping": True}
+
+# --- Engine/pool tuning ------------------------------------------------------
+# On Vercel each request may run in its own short-lived function instance, so
+# SQLAlchemy's own connection pool can't be reused across invocations anyway.
+# For Postgres we hand pooling off to Neon's built-in PgBouncer (use the
+# "-pooler" connection string from the Neon dashboard) and disable SQLAlchemy's
+# local pool with NullPool, so every request opens/closes cleanly against the
+# pooler instead of holding a stale connection. For local SQLite dev, a
+# regular pool with pool_recycle is fine since there's a single long-running
+# process.
+is_postgres = db_url.startswith("postgresql")
+
+if is_postgres:
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+        "poolclass": NullPool,
+        "pool_pre_ping": True,
+        "connect_args": {
+            "connect_timeout": 10,
+            # Disable server-side prepared statement caching — PgBouncer's
+            # transaction pooling mode (which Neon's pooler uses) doesn't
+            # support prepared statements persisting across statements.
+            "options": "-c statement_timeout=15000",
+        },
+    }
+else:
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+        "pool_pre_ping": True,
+        "pool_recycle": 280,
+    }
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
@@ -114,8 +144,50 @@ def inject_user():
 
 
 # --------------------------------------------------------------------------
-# Bootstrap: create tables + seed a default admin (idempotent)
+# Bootstrap: create tables + seed a default admin + sample students (idempotent)
 # --------------------------------------------------------------------------
+SAMPLE_STUDENTS = [
+    # roll_no, name, father_name, program, semester, section, phone, address
+    ("CS-101", "Ahmed Hassan", "Muhammad Hassan", "BS Computer Science", 3, "A", "03001234567", "House 12, Street 4, Saddiqabad, Punjab"),
+    ("CS-102", "Fatima Zahra", "Imran Zahra", "BS Computer Science", 3, "A", "03011234568", "House 45, Model Town, Lahore, Punjab"),
+    ("CS-103", "Bilal Sheikh", "Anwar Sheikh", "BS Computer Science", 5, "B", "03021234569", "House 8, Satellite Town, Rawalpindi, Punjab"),
+    ("CS-104", "Ayesha Malik", "Tariq Malik", "BS Computer Science", 1, "A", "03031234570", "House 21, Gulberg, Lahore, Punjab"),
+    ("CS-105", "Usman Farooq", "Farooq Ahmed", "BS Computer Science", 7, "A", "03041234571", "House 3, DHA Phase 5, Karachi, Sindh"),
+    ("SE-201", "Zainab Riaz", "Riaz Ahmed", "BS Software Engineering", 2, "A", "03051234572", "House 17, Township, Lahore, Punjab"),
+    ("SE-202", "Hamza Iqbal", "Iqbal Nasir", "BS Software Engineering", 4, "B", "03061234573", "House 30, Johar Town, Lahore, Punjab"),
+    ("SE-203", "Sana Aslam", "Aslam Khan", "BS Software Engineering", 6, "A", "03071234574", "House 5, Cantt, Multan, Punjab"),
+    ("SE-204", "Umar Siddiqui", "Siddiqui Anwar", "BS Software Engineering", 2, "B", "03081234575", "House 9, Faisal Town, Lahore, Punjab"),
+    ("BBA-301", "Mariam Yousaf", "Yousaf Khan", "BS Business Administration", 5, "A", "03091234576", "House 14, Bahria Town, Islamabad"),
+    ("BBA-302", "Ali Raza", "Raza Muhammad", "BS Business Administration", 1, "A", "03101234577", "House 22, G-9, Islamabad"),
+    ("BBA-303", "Hira Shahid", "Shahid Mehmood", "BS Business Administration", 3, "B", "03111234578", "House 6, Askari 10, Lahore, Punjab"),
+    ("EE-401", "Danish Elahi", "Elahi Bakhsh", "BS Electrical Engineering", 6, "A", "03121234579", "House 11, Wapda Town, Lahore, Punjab"),
+    ("EE-402", "Noor Fatima", "Fatima Hussain", "BS Electrical Engineering", 4, "A", "03131234580", "House 19, Samanabad, Lahore, Punjab"),
+    ("EE-403", "Kashif Mahmood", "Mahmood Sarwar", "BS Electrical Engineering", 8, "B", "03141234581", "House 2, Cantt, Sialkot, Punjab"),
+    ("MATH-501", "Rabia Aziz", "Aziz Ahmad", "BS Mathematics", 2, "A", "03151234582", "House 27, Green Town, Lahore, Punjab"),
+    ("MATH-502", "Junaid Akhtar", "Akhtar Javed", "BS Mathematics", 5, "A", "03161234583", "House 4, Iqbal Town, Faisalabad, Punjab"),
+    ("MATH-503", "Sadia Kausar", "Kausar Pervaiz", "BS Mathematics", 7, "B", "03171234584", "House 33, Model Colony, Karachi, Sindh"),
+    ("CS-106", "Waqas Ahmed", "Ahmed Bashir", "BS Computer Science", 1, "B", "03181234585", "House 16, Peoples Colony, Faisalabad, Punjab"),
+    ("SE-205", "Amna Tariq", "Tariq Rasheed", "BS Software Engineering", 8, "A", "03191234586", "House 40, Cavalry Ground, Lahore, Punjab"),
+]
+
+
+def seed_students():
+    if Student.query.count() > 0:
+        return
+    for roll_no, name, father_name, program, semester, section, phone, address in SAMPLE_STUDENTS:
+        db.session.add(Student(
+            roll_no=roll_no,
+            name=name,
+            father_name=father_name,
+            program=program,
+            semester=semester,
+            section=section,
+            phone=phone,
+            address=address,
+        ))
+    db.session.commit()
+
+
 def init_db():
     db.create_all()
     if User.query.count() == 0:
@@ -123,6 +195,7 @@ def init_db():
         admin.set_password("admin123")
         db.session.add(admin)
         db.session.commit()
+    seed_students()
 
 
 with app.app_context():

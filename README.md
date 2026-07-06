@@ -79,7 +79,14 @@ your-project-folder/
 ## Deploying to Vercel with Neon Postgres
 
 1. **Create a Neon database** at [neon.tech](https://neon.tech) and copy the
-   connection string from the dashboard (Connection Details).
+   **pooled** connection string from the dashboard (Connect -> the string
+   whose hostname contains `-pooler`, e.g.
+   `ep-cool-rain-123456-pooler.us-east-2.aws.neon.tech`). Use the pooled
+   string, not the direct one — the app's engine settings in `api/index.py`
+   (`NullPool` + `pool_pre_ping`) are tuned to hand connection pooling off to
+   Neon's built-in PgBouncer, which only the pooled endpoint routes through.
+   The direct (non-pooled) string is only useful for one-off admin tasks
+   like running a migration tool by hand.
 
 2. **Push this project to a GitHub repo**, then import it in Vercel
    (`Add New -> Project -> Import Git Repository`).
